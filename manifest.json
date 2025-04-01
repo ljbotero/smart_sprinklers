@@ -1,0 +1,11 @@
+{
+  "domain": "smart_sprinklers",
+  "name": "Smart Sprinklers System",
+  "documentation": "https://github.com/lbbotero/smart_sprinklers",
+  "dependencies": ["weather"],
+  "codeowners": [],
+  "requirements": [],
+  "iot_class": "local_polling",
+  "version": "1.0.0",
+  "config_flow": true
+}

@@ -1,0 +1,110 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Smart Sprinklers Setup",
+        "description": "Set up your Smart Sprinklers system",
+        "data": {
+          "weather_entity": "Weather Entity",
+          "rain_sensor": "Rain Sensor (optional)",
+          "schedule_entity": "Schedule Helper (optional)",
+          "freeze_threshold": "Freeze Threshold (°F)",
+          "cycle_time": "Cycle Time (minutes)",
+          "soak_time": "Soak Time (minutes)",
+          "rain_threshold": "Rain Threshold (mm)"
+        }
+      }
+    },
+    "error": {
+      "entity_not_found": "Entity not found",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Smart Sprinklers is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "menu": {
+        "title": "Smart Sprinklers Configuration",
+        "description": "Choose what to configure",
+        "menu_options": {
+          "configure_zones": "Configure Zones",
+          "configure_thresholds": "Configure System Settings",
+          "run_integration_tests": "Run Integration Tests"
+        }
+      },
+      "run_integration_tests": {
+        "title": "Run Integration Tests",
+        "description": "Click Submit to run the integration tests. This may take a few minutes and will not activate any sprinklers.",
+        "data": {}
+      },
+      "test_results": {
+        "title": "Integration Test Results",
+        "description": "Results of the integration tests:\n\n{results}\n\nClick Submit to return to the main menu.",
+        "data": {}
+      },
+      "add_zone": {
+        "title": "Add Sprinklers Zone",
+        "description": "Add a new sprinklers zone",
+        "data": {
+          "name": "Zone Name",
+          "switch": "Sprinkler Switch",
+          "temperature_sensor": "Temperature Sensor",
+          "moisture_sensor": "Moisture Sensor",
+          "min_moisture": "Minimum Moisture Level (%)",
+          "max_moisture": "Maximum Moisture Level (%)",
+          "max_watering_hours": "Maximum Watering Hours",
+          "max_watering_minutes": "Maximum Watering Minutes (0-59)"
+        }
+      },
+      "zone_menu": {
+        "title": "Zone Management",
+        "description": "What would you like to do?",
+        "menu_options": {
+          "add_zone": "Add Zone",
+          "edit_zones": "Edit Existing Zones",
+          "menu": "Return to Main Menu"
+        }
+      },
+      "edit_zones": {
+        "title": "Edit Zone",
+        "description": "Select a zone to edit",
+        "data": {
+          "zone_index": "Zone to Edit"
+        }
+      },
+      "edit_zone": {
+        "title": "Edit Zone Details",
+        "description": "Modify zone configuration",
+        "data": {
+          "name": "Zone Name",
+          "switch": "Sprinkler Switch",
+          "temperature_sensor": "Temperature Sensor",
+          "moisture_sensor": "Moisture Sensor",
+          "min_moisture": "Minimum Moisture Level (%)",
+          "max_moisture": "Maximum Moisture Level (%)",
+          "max_watering_hours": "Maximum Watering Hours",
+          "max_watering_minutes": "Maximum Watering Minutes (0-59)"
+        }
+      },
+      "configure_thresholds": {
+        "title": "Configure System Settings",
+        "description": "Adjust system-wide settings. A restart of Home Assistant may be required for some changes to take effect.",
+        "data": {
+          "weather_entity": "Weather Entity",
+          "rain_sensor": "Rain Sensor (optional)",
+          "freeze_threshold": "Freeze Threshold (°F)",
+          "cycle_time": "Cycle Time (minutes)",
+          "soak_time": "Soak Time (minutes)",
+          "rain_threshold": "Rain Threshold (mm)",
+          "schedule_entity": "Schedule Helper (optional)"
+        }
+      }
+    },
+    "error": {
+      "entity_not_found": "Entity not found",
+      "unknown": "Unexpected error"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+# Service definitions for Smart Sprinklers
+
+refresh_forecast:
+  name: Refresh Weather Forecast
+  description: Refresh the weather forecast data used for sprinklers decisions.
+
+reset_statistics:
+  name: Reset Statistics
+  description: Reset all learning data and statistics for all sprinklers zones.
+
+update_moisture_deficit:
+  name: Update Moisture Deficit
+  description: Manually trigger moisture deficit calculation for all zones.
+
+force_et_calculation:
+  name: Force ET Calculation
+  description: Force calculation of evapotranspiration for all zones.
+
+force_precipitation_calculation:
+  name: Force Precipitation Calculation
+  description: Force calculation of precipitation from sensors and weather data.

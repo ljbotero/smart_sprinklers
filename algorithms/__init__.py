@@ -1,0 +1,1 @@
+"""Smart Sprinklers algorithms package."""

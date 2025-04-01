@@ -1,0 +1,157 @@
+
+Smart Sprinklers Integration Tests - 2025-03-28 15:11:13
+----------------------------------------------------------------------
+
+Running tests from test_config
+--------------------------------------------------
+Running test_config_entry_setup... 
+FAILED: Domain smart_sprinklers not found in hass.data
+Running test_entities_registered... 
+FAILED: System enable switch not found
+Running test_services_registered... 
+FAILED: Service smart_sprinklers.refresh_forecast not registered
+
+Running tests from test_zones
+--------------------------------------------------
+Running test_zone_entities_created... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_zones.py", line 39, in test_zone_entities_created
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_zone_learning_initialized... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_zones.py", line 111, in test_zone_learning_initialized
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_zone_status_values... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_zones.py", line 83, in test_zone_status_values
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_zones_configured... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_zones.py", line 19, in test_zones_configured
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+
+Running tests from test_weather
+--------------------------------------------------
+Running test_fetch_forecast_service... 
+FAILED: Service smart_sprinklers.refresh_forecast not registered
+Running test_forecast_methods... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_weather.py", line 42, in test_forecast_methods
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_freeze_threshold_defined... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_weather.py", line 68, in test_freeze_threshold_defined
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_weather_entity_defined... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_weather.py", line 18, in test_weather_entity_defined
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+
+Running tests from test_scheduling
+--------------------------------------------------
+Running test_get_schedule_remaining_time... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_scheduling.py", line 76, in test_get_schedule_remaining_time
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_schedule_entity_handling... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_scheduling.py", line 42, in test_schedule_entity_handling
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_schedule_methods_exist... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_scheduling.py", line 18, in test_schedule_methods_exist
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+
+Running tests from test_algorithms
+--------------------------------------------------
+Running test_absorption_learner_functionality... 
+PASSED
+Running test_absorption_learners_initialized... 
+ERROR: 'smart_sprinklers'
+Traceback (most recent call last):
+  File "/config/custom_components/smart_sprinklers/integ_tests/runner.py", line 73, in run_tests
+    result = await func(hass)
+             ^^^^^^^^^^^^^^^^
+  File "/config/custom_components/smart_sprinklers/integ_tests/test_algorithms.py", line 20, in test_absorption_learners_initialized
+    coordinator = hass.data[DOMAIN].get(entries[0].entry_id)
+                  ~~~~~~~~~^^^^^^^^
+KeyError: 'smart_sprinklers'
+
+Running test_reset_statistics_service... 
+FAILED: Service smart_sprinklers.reset_statistics not registered
+Running test_watering_calculations... 
+PASSED
+
+==================================================
+Test Summary: 2/18 tests passed
+==================================================
