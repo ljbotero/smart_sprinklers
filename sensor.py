@@ -29,6 +29,7 @@ from .const import (
     ATTR_MOISTURE_HISTORY,
     ATTR_ABSORPTION_RATE,
     ATTR_ESTIMATED_WATERING_DURATION,
+    ATTR_EFFICIENCY_FACTOR,
     ZONE_STATE_IDLE,
     ZONE_STATE_WATERING,
     ZONE_STATE_SOAKING,
@@ -51,8 +52,9 @@ async def async_setup_entry(
         entities.append(ZoneEfficiencySensor(coordinator, zone_id))
         entities.append(ZoneAbsorptionSensor(coordinator, zone_id))
         entities.append(ZoneLastWateredSensor(coordinator, zone_id))
-        entities.append(ZoneMoistureDeficitSensor(coordinator, zone_id))    
-        
+        entities.append(ZoneMoistureDeficitSensor(coordinator, zone_id))
+        entities.append(ZoneEfficiencyFactorSensor(coordinator, zone_id))  # New efficiency factor sensor
+    
     # Add the weather data sensor
     entities.append(WeatherDataSensor(coordinator))
     
@@ -247,9 +249,9 @@ class WeatherDataSensor(SensorEntity):
     def extra_state_attributes(self) -> Dict[str, Any]:
         """Return additional attributes."""
         return {
-            ATTR_DAILY_PRECIPITATION: self.coordinator.daily_precipitation,
+            "daily_precipitation": self.coordinator.daily_precipitation,
             # Daily ET is per zone, so we take an average or the first zone as representative
-            ATTR_DAILY_ET: next(iter(self.coordinator.daily_et.values())) if self.coordinator.daily_et else 0.0,
+            "daily_et": next(iter(self.coordinator.daily_et.values())) if self.coordinator.daily_et else 0.0,
             "rain_threshold": self.coordinator.rain_threshold,
             "freeze_threshold": self.coordinator.freeze_threshold,
         }
@@ -289,3 +291,42 @@ class ZoneMoistureDeficitSensor(SensorEntity):
         """Return the state of the sensor."""
         zone = self.coordinator.zones[self.zone_id]
         return round(zone.get("moisture_deficit", 0.0), 1)
+
+
+class ZoneEfficiencyFactorSensor(SensorEntity):
+    """Sensor showing the efficiency factor of a zone."""
+
+    def __init__(self, coordinator, zone_id):
+        """Initialize the zone efficiency factor sensor."""
+        self.coordinator = coordinator
+        self.zone_id = zone_id
+        zone_name = coordinator.zones[zone_id]["name"]
+        
+        self._attr_name = f"{zone_name} Efficiency Factor"
+        self._attr_unique_id = f"{DOMAIN}_{zone_id}_efficiency_factor"
+        self._attr_has_entity_name = True
+        self._attr_device_class = None
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = None  # Dimensionless factor
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        
+    @property
+    def icon(self):
+        """Return the icon for the sensor."""
+        efficiency_factor = self.coordinator.zones[self.zone_id].get(
+            ATTR_EFFICIENCY_FACTOR, 1.0
+        )
+        
+        if efficiency_factor >= 0.9:
+            return "mdi:water-check-outline"  # High efficiency
+        elif efficiency_factor >= 0.7:
+            return "mdi:water-outline"        # Medium efficiency
+        else:
+            return "mdi:water-alert-outline"  # Low efficiency
+        
+    @property
+    def native_value(self) -> float:
+        """Return the state of the sensor."""
+        zone = self.coordinator.zones[self.zone_id]
+        factor = zone.get(ATTR_EFFICIENCY_FACTOR, 1.0)
+        return round(factor, 2)

@@ -34,6 +34,19 @@ def calculate_watering_duration(current_moisture, target_moisture, absorption_ra
         _LOGGER.warning("Invalid cycle time: %s", cycle_time)
         cycle_time = 15  # Default to 15 minutes
     
+    # Upper safety bounds for parameters
+    if absorption_rate > 10.0:
+        _LOGGER.warning("Unusually high absorption rate (%.1f%%/min) capped at 10.0%%/min", absorption_rate)
+        absorption_rate = 10.0
+    
+    if cycle_time > 60:
+        _LOGGER.warning("Unusually high cycle time (%d min) capped at 60 min", cycle_time)
+        cycle_time = 60
+    
+    # Apply safety limit to current and target moisture
+    current_moisture = min(100, max(0, current_moisture))
+    target_moisture = min(100, max(0, target_moisture))
+    
     # Calculate moisture difference needed
     moisture_difference = max(0, target_moisture - current_moisture)
     
@@ -43,6 +56,14 @@ def calculate_watering_duration(current_moisture, target_moisture, absorption_ra
     
     # Calculate base duration
     base_duration = moisture_difference / absorption_rate if absorption_rate > 0 else cycle_time
+    
+    # Safety cap on base duration
+    if base_duration > 120:  # Cap at 2 hours before saturation factor
+        _LOGGER.warning(
+            "Very high base watering duration capped: from %d to 120 minutes", 
+            base_duration
+        )
+        base_duration = 120
     
     # Apply adjustment for non-linear absorption
     # As the soil gets more saturated, absorption slows down
@@ -56,6 +77,16 @@ def calculate_watering_duration(current_moisture, target_moisture, absorption_ra
     # Round to the nearest cycle
     cycles_needed = math.ceil(adjusted_duration / cycle_time)
     total_duration = cycles_needed * cycle_time
+    
+    # Apply absolute safety cap - never water more than 3 hours total
+    absolute_max = 180  # 3 hours in minutes
+    if total_duration > absolute_max:
+        _LOGGER.warning(
+            "Duration exceeds absolute maximum: capping from %d to %d minutes", 
+            total_duration, absolute_max
+        )
+        total_duration = absolute_max
+        cycles_needed = math.ceil(absolute_max / cycle_time)
     
     # Apply maximum watering time limit if specified
     if max_watering_time is not None and max_watering_time > 0:
@@ -95,46 +126,74 @@ def distribute_watering_time(zones_data, available_minutes, cycle_time, min_cycl
     Returns:
         dict: Zone index to cycle count mapping
     """
+    # Validate input parameters
+    if not isinstance(available_minutes, (int, float)) or available_minutes <= 0:
+        _LOGGER.warning("Invalid available minutes: %s", available_minutes)
+        return {}  # Return empty dict to skip all zones
+        
+    if not isinstance(cycle_time, (int, float)) or cycle_time <= 0:
+        _LOGGER.warning("Invalid cycle time: %s", cycle_time)
+        cycle_time = 15  # Default
+        
+    if not zones_data:
+        return {}  # No zones
+    
     # Calculate moisture deficit and required time for each zone
     total_required_minutes = 0
     required_minutes = []
     moisture_deficits = []
     
     for zone in zones_data:
-        # Calculate moisture deficit (how much we need to increase)
-        current = zone.get("current_moisture", 0)
-        target = zone.get("target_moisture", 0)
-        deficit = max(0, target - current)
-        moisture_deficits.append(deficit)
-        
-        # Get optional moisture deficit in mm
-        moisture_deficit_mm = zone.get("moisture_deficit", 0.0)
-        
-        # Calculate required time based on absorption rate
-        absorption_rate = zone.get("absorption_rate", 0.5)  # %/minute
-        if absorption_rate <= 0:
-            absorption_rate = 0.5  # Default fallback
+        try:
+            # Calculate moisture deficit (how much we need to increase)
+            current = zone.get("current_moisture", 0)
+            target = zone.get("target_moisture", 0)
+            deficit = max(0, target - current)
+            moisture_deficits.append(deficit)
             
-        # Apply saturation factor (same as in calculate_watering_duration)
-        saturation_factor = 1.0 + (0.5 * (current / 100.0))
-        required_time = (deficit / absorption_rate) * saturation_factor if deficit > 0 else 0
-        
-        # Add additional watering time for moisture deficit
-        # Approximate: 1mm deficit requires about 2.5 minutes of watering
-        additional_time = 0
-        if moisture_deficit_mm > 5.0:  # Only add time if deficit is significant
-            additional_time = moisture_deficit_mm * 2.5
+            # Get optional moisture deficit in mm
+            moisture_deficit_mm = zone.get("moisture_deficit", 0.0)
             
-        total_required = required_time + additional_time
-        required_minutes.append(total_required)
-        total_required_minutes += total_required
-        
-        # Log the calculated values
-        _LOGGER.debug(
-            "Zone needs %.1f minutes (%.1f from moisture + %.1f from deficit of %.1f mm)",
-            total_required, required_time, additional_time, moisture_deficit_mm
-        )
+            # Calculate required time based on absorption rate
+            absorption_rate = zone.get("absorption_rate", 0.5)  # %/minute
+            if absorption_rate <= 0:
+                absorption_rate = 0.5  # Default fallback
+                
+            # Apply saturation factor (same as in calculate_watering_duration)
+            saturation_factor = 1.0 + (0.5 * (current / 100.0))
+            required_time = (deficit / absorption_rate) * saturation_factor if deficit > 0 else 0
+            
+            # Add additional watering time for moisture deficit
+            # Approximate: 1mm deficit requires about 2.5 minutes of watering
+            additional_time = 0
+            if moisture_deficit_mm > 5.0:  # Only add time if deficit is significant
+                additional_time = moisture_deficit_mm * 2.5
+                
+            total_required = required_time + additional_time
+            # Apply safety cap - no single zone should need more than 2 hours
+            if total_required > 120:
+                _LOGGER.warning(
+                    "Zone requires excessive time (%.1f min) - capping at 120 min", 
+                    total_required
+                )
+                total_required = 120
+                
+            required_minutes.append(total_required)
+            total_required_minutes += total_required
+            
+            # Log the calculated values
+            _LOGGER.debug(
+                "Zone needs %.1f minutes (%.1f from moisture + %.1f from deficit of %.1f mm)",
+                total_required, required_time, additional_time, moisture_deficit_mm
+            )
+        except Exception as e:
+            _LOGGER.error("Error calculating zone requirements: %s", e)
+            required_minutes.append(0)
+            moisture_deficits.append(0)
     
+    # If no zone needs water, return empty result
+    if total_required_minutes <= 0:
+        return {}
     
     # If the total required time is less than available, we can fulfill all needs
     if total_required_minutes <= available_minutes:

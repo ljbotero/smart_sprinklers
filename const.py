@@ -51,6 +51,7 @@ ATTR_MAX_WATERING_TIME = "max_watering_time"
 ATTR_MOISTURE_DEFICIT = "moisture_deficit"  # Track moisture deficit in mm
 ATTR_DAILY_ET = "daily_et"  # Daily evapotranspiration in mm
 ATTR_DAILY_PRECIPITATION = "daily_precipitation"  # Daily precipitation in mm
+ATTR_EFFICIENCY_FACTOR = "efficiency_factor"  # Irrigation efficiency factor
 
 # System states
 STATE_ENABLED = "enabled"

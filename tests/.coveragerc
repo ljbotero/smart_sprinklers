@@ -1,0 +1,20 @@
+[run]
+source = .
+omit = 
+    */tests/*
+    */__init__.py
+    */integ_tests/*
+    */.venv/*
+    */custom_components/hacs/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    pass
+    raise ImportError
+
+[html]
+directory = coverage_html
