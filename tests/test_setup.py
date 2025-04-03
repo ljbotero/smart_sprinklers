@@ -1,23 +1,58 @@
-"""Common test setup for smart_sprinklers tests."""
-import os
-import sys
+#!/usr/bin/env python3
+"""Test services.py using direct mocking."""
 import unittest
-from unittest.mock import MagicMock, patch
+import asyncio
+from unittest.mock import MagicMock, AsyncMock
 
-# Add parent directory to path so we can import the module
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+# Import test helpers
+from test_helpers import load_component_module, setup_test_env
+setup_test_env()
 
-# Mock Home Assistant dependencies
-sys.modules['homeassistant'] = MagicMock()
-sys.modules['homeassistant.core'] = MagicMock()
-sys.modules['homeassistant.config_entries'] = MagicMock()
-sys.modules['homeassistant.helpers'] = MagicMock()
-sys.modules['homeassistant.helpers.entity'] = MagicMock()
-sys.modules['homeassistant.helpers.entity_platform'] = MagicMock()
-sys.modules['homeassistant.helpers.event'] = MagicMock()
-sys.modules['homeassistant.components.switch'] = MagicMock()
-sys.modules['homeassistant.util'] = MagicMock()
-sys.modules['homeassistant.util.dt'] = MagicMock()
-sys.modules['homeassistant.const'] = MagicMock()
+# Load the module under test
+services = load_component_module("services")
+register_services = services.register_services
+async_service_reset_statistics = services.async_service_reset_statistics
+
+class TestServices(unittest.TestCase):
+    """Test the services module."""
+    
+    def setUp(self):
+        """Set up for each test."""
+        # Create a mock coordinator
+        self.coordinator = MagicMock()
+        self.coordinator.hass = MagicMock()
+        self.coordinator.hass.services = MagicMock()
+        
+        # Use AsyncMock to properly mock async methods
+        self.coordinator.hass.services.async_register = AsyncMock()
+        
+        self.coordinator.weather_manager = MagicMock()
+        self.coordinator.weather_manager.async_update_forecast = AsyncMock()
+        self.coordinator.absorption_learners = {}
+        self.coordinator.zones = {}
+        self.coordinator.daily_et = {}
+        self.coordinator.daily_precipitation = 0.0
+        self.coordinator.async_send_notification = AsyncMock()
+    
+    # Helper for async tests
+    def async_test(coro):
+        def wrapper(*args, **kwargs):
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(coro(*args, **kwargs))
+        return wrapper
+    
+    @async_test
+    async def test_register_services(self):
+        """Test registering services."""
+        # Call the function under test
+        result = await register_services(self.coordinator.hass, self.coordinator)
+        
+        # Assert results
+        self.assertTrue(result)
+        # Check that services were registered
+        expected_calls = 5  # Total number of services registered
+        self.assertEqual(self.coordinator.hass.services.async_register.call_count, expected_calls)
+
+
+if __name__ == "__main__":
+    unittest.main()
