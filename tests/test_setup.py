@@ -23,8 +23,8 @@ class TestServices(unittest.TestCase):
         self.coordinator.hass = MagicMock()
         self.coordinator.hass.services = MagicMock()
         
-        # Use AsyncMock to properly mock async methods
-        self.coordinator.hass.services.async_register = AsyncMock()
+        # Use a regular MagicMock instead of AsyncMock to avoid coroutine warnings
+        self.coordinator.hass.services.async_register = MagicMock()
         
         self.coordinator.weather_manager = MagicMock()
         self.coordinator.weather_manager.async_update_forecast = AsyncMock()
